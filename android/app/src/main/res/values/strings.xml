@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Flowlist</string>
+    <string name="notification_channel_name">Flowlist 提醒</string>
+    <string name="notification_channel_description">任务到点提醒</string>
+</resources>

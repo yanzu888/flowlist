@@ -1,0 +1,33 @@
+# Dependencies and desktop build output
+node_modules/
+dist/
+release/
+
+# Test output and local artifacts
+/artifacts/
+
+# Android cache, generated files, and local configuration
+.android-cache/
+android/.gradle/
+android/app/build/
+android/build/
+android/app/src/main/assets/
+/android/manual-build/
+/android/local.properties
+
+# Local environment configuration (keep the public example)
+.env
+.env.*
+!.env.example
+
+# Signing keys and private certificates
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.pem
+*.key
+
+# Logs and operating system metadata
+*.log
+.DS_Store

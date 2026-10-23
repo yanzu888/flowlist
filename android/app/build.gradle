@@ -1,0 +1,53 @@
+plugins {
+    id 'com.android.application'
+}
+
+def webSource = file('../../src')
+def webAssets = file('src/main/assets')
+
+tasks.register('syncWebAssets', Sync) {
+    from(webSource) {
+        exclude 'main.js'
+        exclude 'preload.js'
+    }
+    into(webAssets)
+    from('../../node_modules/lucide/dist/umd/lucide.min.js') {
+        rename { 'lucide.js' }
+        into('vendor')
+    }
+}
+
+tasks.register('syncAppIcon', Copy) {
+    from('../../assets/app-icon.png')
+    into('src/main/res/drawable-nodpi')
+    rename { 'app_icon.png' }
+}
+
+tasks.named('preBuild').configure {
+    dependsOn('syncWebAssets', 'syncAppIcon')
+}
+
+android {
+    namespace 'com.flowlist.mobile'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.flowlist.mobile'
+        minSdk 26
+        targetSdk 35
+        versionCode 11
+        versionName '1.1.0'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self';" />
+    <title>Flowlist</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="任务导航">
+        <div class="brand">
+          <div class="brand-mark"><i data-lucide="list-checks"></i></div>
+          <div>
+            <strong>Flowlist</strong>
+            <span>把今天理清楚</span>
+          </div>
+        </div>
+
+        <button class="primary-action" id="openCreateButton" type="button">
+          <i data-lucide="plus"></i>
+          <span>新建任务</span>
+          <kbd>Ctrl N</kbd>
+        </button>
+
+        <nav class="nav-list" id="viewNavigation">
+          <button class="nav-item active" data-view="today" type="button">
+            <i data-lucide="sun"></i><span>今天</span><b id="todayCount">0</b>
+          </button>
+          <button class="nav-item" data-view="upcoming" type="button">
+            <i data-lucide="calendar-days"></i><span>即将到来</span><b id="upcomingCount">0</b>
+          </button>
+          <button class="nav-item" data-view="all" type="button">
+            <i data-lucide="inbox"></i><span>全部任务</span><b id="allCount">0</b>
+          </button>
+          <button class="nav-item" data-view="completed" type="button">
+            <i data-lucide="circle-check-big"></i><span>已完成</span><b id="completedCount">0</b>
+          </button>
+        </nav>
+
+        <div class="sidebar-note">
+          <div class="note-icon"><i data-lucide="bell-ring"></i></div>
+          <div class="note-content">
+            <strong><span class="status-dot"></span><span id="reminderStatus">提醒正在运行</span></strong>
+            <p>关闭窗口后，Flowlist 仍会通过系统通知提醒。</p>
+            <button class="sidebar-test" id="testReminderButton" type="button">
+              <i data-lucide="volume-2"></i>测试提醒
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div class="mobile-brand"><i data-lucide="list-checks"></i><strong>Flowlist</strong></div>
+          <label class="search-box">
+            <i data-lucide="search"></i>
+            <input id="searchInput" type="search" placeholder="搜索任务" autocomplete="off" />
+            <kbd>Ctrl K</kbd>
+          </label>
+          <button class="icon-button mobile-add" id="mobileAddButton" type="button" aria-label="新建任务" title="新建任务">
+            <i data-lucide="plus"></i>
+          </button>
+          <div class="clock" id="liveClock" aria-label="当前时间"></div>
+        </header>
+
+        <div class="content-grid">
+          <section class="task-stage" aria-labelledby="viewTitle">
+            <div class="stage-heading">
+              <div>
+                <p class="date-line" id="dateLine"></p>
+                <h1 id="viewTitle">今天</h1>
+              </div>
+              <div class="stage-meta" id="stageMeta">0 项待完成</div>
+            </div>
+
+            <form class="quick-entry" id="quickEntryForm">
+              <span class="quick-dot" aria-hidden="true"></span>
+              <input id="quickTitle" type="text" maxlength="120" placeholder="添加一项任务，按 Enter 保存" aria-label="任务标题" autocomplete="off" />
+              <button class="quick-date" id="quickDateButton" type="button" title="设置到期时间">
+                <i data-lucide="calendar-clock"></i><span id="quickDateLabel">今天</span>
+              </button>
+              <button class="icon-button submit-quick" type="submit" aria-label="添加任务" title="添加任务">
+                <i data-lucide="arrow-up"></i>
+              </button>
+            </form>
+
+            <div class="task-scroll" id="taskScroll">
+              <div class="task-list" id="taskList"></div>
+              <div class="empty-state" id="emptyState" hidden>
+                <div class="empty-check"><i data-lucide="check"></i></div>
+                <h2 id="emptyTitle">今天已经清空</h2>
+                <p id="emptyCopy">把下一件要做的事写下来，给它一个明确时间。</p>
+                <button class="secondary-action" id="emptyAddButton" type="button">
+                  <i data-lucide="plus"></i>新建任务
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <aside class="day-panel" aria-label="今日概览">
+            <section class="progress-section">
+              <div class="section-kicker">今日进度</div>
+              <div class="progress-display">
+                <div class="progress-ring" id="progressRing">
+                  <span id="progressPercent">0%</span>
+                </div>
+                <div>
+                  <strong id="progressText">尚未开始</strong>
+                  <p id="progressDetail">今天还没有任务</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="calendar-section">
+              <div class="panel-heading">
+                <div>
+                  <div class="section-kicker">日期</div>
+                  <strong id="calendarMonth"></strong>
+                </div>
+                <button class="icon-button" id="jumpTodayButton" type="button" aria-label="回到今天" title="回到今天">
+                  <i data-lucide="locate-fixed"></i>
+                </button>
+              </div>
+              <div class="mini-calendar" id="miniCalendar"></div>
+            </section>
+
+            <section class="next-section">
+              <div class="section-kicker">下一项提醒</div>
+              <div id="nextReminder" class="next-reminder">
+                <i data-lucide="bell-off"></i>
+                <p>暂无已设置的提醒</p>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </main>
+    </div>
+
+    <dialog class="task-dialog" id="taskDialog">
+      <form id="taskForm" method="dialog">
+        <div class="dialog-header">
+          <div>
+            <p class="section-kicker" id="dialogKicker">新建任务</p>
+            <h2 id="dialogTitle">安排一件事</h2>
+          </div>
+          <button class="icon-button" id="closeDialogButton" type="button" aria-label="关闭" title="关闭">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+
+        <input type="hidden" id="taskId" />
+        <label class="field field-title">
+          <span>任务名称</span>
+          <input id="taskTitle" type="text" maxlength="120" placeholder="例如：确认项目发布清单" required autofocus />
+        </label>
+
+        <label class="field">
+          <span>备注</span>
+          <textarea id="taskNotes" rows="3" maxlength="500" placeholder="补充需要记住的信息"></textarea>
+        </label>
+
+        <div class="field-row">
+          <label class="field">
+            <span>日期</span>
+            <input id="taskDate" type="date" />
+          </label>
+          <label class="field">
+            <span>时间</span>
+            <input id="taskTime" type="time" />
+          </label>
+        </div>
+
+        <div class="field-row">
+          <label class="field">
+            <span>提醒</span>
+            <select id="taskReminder">
+              <option value="none">不提醒</option>
+              <option value="0" selected>到期时</option>
+              <option value="5">提前 5 分钟</option>
+              <option value="15">提前 15 分钟</option>
+              <option value="60">提前 1 小时</option>
+              <option value="1440">提前 1 天</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>优先级</span>
+            <select id="taskPriority">
+              <option value="none">普通</option>
+              <option value="low">低</option>
+              <option value="medium">中</option>
+              <option value="high">高</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="dialog-actions">
+          <button class="danger-action" id="deleteTaskButton" type="button" hidden>
+            <i data-lucide="trash-2"></i>删除
+          </button>
+          <span class="action-spacer"></span>
+          <button class="secondary-action" id="cancelTaskButton" type="button">取消</button>
+          <button class="save-action" type="submit"><i data-lucide="check"></i>保存任务</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+    <script src="vendor/lucide.js"></script>
+    <script src="platform-bridge.js"></script>
+    <script src="task-core.js"></script>
+    <script src="renderer.js"></script>
+  </body>
+</html>

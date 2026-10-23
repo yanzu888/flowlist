@@ -1,0 +1,50 @@
+{
+  "name": "flowlist",
+  "version": "1.1.0",
+  "description": "A focused Windows task list with native reminders.",
+  "author": "Flowlist",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "test": "node --test tests/*.test.js",
+    "test:visual": "node scripts/visual-check.js",
+    "test:reminder": "node scripts/reminder-check.js",
+    "test:tray": "node scripts/tray-icon-check.js",
+    "test:package": "node scripts/package-smoke.js",
+    "android:bootstrap": "powershell -ExecutionPolicy Bypass -File scripts/bootstrap-android.ps1",
+    "android:build": "powershell -ExecutionPolicy Bypass -File scripts/build-android.ps1",
+    "android:build:manual": "powershell -ExecutionPolicy Bypass -File scripts/build-android-manual.ps1",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --win nsis"
+  },
+  "build": {
+    "appId": "com.flowlist.desktop",
+    "productName": "Flowlist",
+    "electronDist": "node_modules/electron/dist",
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "artifactName": "Flowlist-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "Flowlist"
+    }
+  },
+  "dependencies": {
+    "lucide": "^1.33.0"
+  },
+  "devDependencies": {
+    "electron": "^43.4.1",
+    "electron-builder": "^26.15.3",
+    "playwright-core": "^1.62.1",
+    "sharp": "^0.35.3"
+  }
+}
